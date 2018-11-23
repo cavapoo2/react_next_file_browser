@@ -1,0 +1,21 @@
+{
+  "name": "pass-server-data",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "node server.js",
+    "build": "next build",
+    "start": "NODE_ENV=production node server.js"
+  },
+  "dependencies": {
+    "axios": "^0.18.0",
+    "express": "^4.14.0",
+    "isomorphic-unfetch": "^2.0.0",
+    "next": "7.0.2",
+    "react": "16.6.3",
+    "react-dom": "16.6.3"
+  },
+  "license": "ISC",
+  "devDependencies": {
+    "morgan": "^1.9.1"
+  }
+}
