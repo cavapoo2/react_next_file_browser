@@ -4,6 +4,7 @@ import Clock from '../components/intervalTimer';
 import DebugButton from '../components/debugButton';
 import ListItems from '../components/itemList'
 import axios from 'axios';
+import pathUtil from 'path';
 //import { copyFile } from 'fs';
 
 
@@ -15,6 +16,7 @@ class FileBrowser extends Component {
       validPath: false,
       toggleStopStart: false,
       files: [],
+      content:'',
     }
     this.handlePathChange = this.handlePathChange.bind(this);
     this.debugHandler = this.debugHandler.bind(this);
@@ -26,21 +28,24 @@ class FileBrowser extends Component {
   debugHandler() {
     console.log(this.state);
     this.state.files.map(f => console.log(f));
+    //console.log('content=',this.state.content)
   }
   handleListItem(event, file) {
     console.log('file clicked is=', file);
+    this.callPostClick('/clickBrowser',{path:this.state.path,file:file}
+)
 
   }
   handlePathChange(event) {
 
     console.log('path=', event.target.value);
     this.validPath(event.target.value);
-    this.setState({ path: event.target.value, toggleStopStart: true });
+    this.setState({ content:'',path: event.target.value, toggleStopStart: true });
 
-  }/*
-  callPost() {
-    axios.post('/dir', {
-      data: this.state.path
+  }
+  callPost(path,data) {
+    axios.post(path, {
+      data: data
     })
       .then(response => {
         console.log('resp=', response.data);
@@ -49,14 +54,22 @@ class FileBrowser extends Component {
       .catch(error => {
         console.log(error);
       });
-  }*/
- callPost(path,data) {
+  }
+  callPostClick(path,data) {
     axios.post(path, {
       data: data
     })
       .then(response => {
         console.log('resp=', response.data);
-        this.setState({ files: response.data })
+        if(response.data.isDir === true){
+        this.setState({ files: response.data.res,
+          path:pathUtil.join(data.path,data.file),
+          content:'',
+         })
+        }else {
+          console.log('settign content');
+          this.setState({content:response.data.res})
+        }
       })
       .catch(error => {
         console.log(error);
@@ -79,12 +92,12 @@ class FileBrowser extends Component {
         <div id="page-wrapper" className="clearfix">
           <h1>Simple File Browser</h1>
 
-          <form action="#" method="POST" id="file-form">
+          <form action="#" id="file-form">
             <div className="field">
-              <input onChange={this.handlePathChange} type="text" name="filename" id="filename" placeholder="Filename (e.g. treehouse.txt)" />
+              <input onChange={this.handlePathChange} value={this.state.path} type="text" name="filename" id="filename" placeholder="Enter a path" />
             </div>
             <div className="field">
-              <textarea name="content" id="content" placeholder="Type your content here..."></textarea>
+              <textarea readOnly={"true"} name="content" id="content" value={this.state.content}/>
             </div>
             <div className="field">
               <button type="submit">Save File</button>
