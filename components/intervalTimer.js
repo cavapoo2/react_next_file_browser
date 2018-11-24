@@ -16,18 +16,20 @@ class Clock extends Component {
         clearInterval(this.timerID);
     }
     tick() {
-        if (this.props.toggleStopStart === this.state.toggle) {
-            this.setState({
-                seconds: this.state.seconds + 1
-            })
-
-        } else {
+        if (this.props.toggleStopStart === true) {
             this.setState({
                 seconds: 0,
                 toggle:!this.state.toggle,
+            })
+        //    this.props.elapsedTime(0);
+
+        } else {
+            this.setState({
+                seconds: this.state.seconds + 1,
             });
+//            this.props.elapsedTime(this.state.seconds+1);
         }
-        this.props.elapsedTime(this.state.seconds);
+        this.props.elapsedTime(this.state.seconds)
     }
     render() {
         return (

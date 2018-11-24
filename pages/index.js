@@ -1,44 +1,61 @@
-import React,{Component} from 'react';
+import React, { Component } from 'react';
 import Link from 'next/link';
 import Clock from '../components/intervalTimer';
 import DebugButton from '../components/debugButton';
+import ListItems from '../components/itemList'
 import axios from 'axios';
+//import { copyFile } from 'fs';
 
 
 class FileBrowser extends Component {
   constructor(props) {
     super(props);
     this.state = {
-     path:'', 
-     validPath:false,
-     toggleStopStart:false,
-     files:[],
+      path: '',
+      validPath: false,
+      toggleStopStart: false,
+      files: [],
     }
     this.handlePathChange = this.handlePathChange.bind(this);
     this.debugHandler = this.debugHandler.bind(this);
+    this.handleListItem = this.handleListItem.bind(this);
   }
-  validPath(value){
-    this.setState({validPath:true})
+  validPath(value) {
+    this.setState({ validPath: true })
   }
   debugHandler() {
     console.log(this.state);
+    this.state.files.map(f => console.log(f));
   }
-  handleListItem(event,file) {
+  handleListItem(event, file) {
     console.log('file clicked is=', file);
-  }
-  handlePathChange(event) {
-  
-    console.log(event.target.value);
-    this.validPath(event.target.value);
-    this.setState({path:event.target.value,toggleStopStart:!this.state.toggleStopStart});
 
   }
+  handlePathChange(event) {
+
+    console.log('path=', event.target.value);
+    this.validPath(event.target.value);
+    this.setState({ path: event.target.value, toggleStopStart: true });
+
+  }/*
   callPost() {
     axios.post('/dir', {
       data: this.state.path
     })
       .then(response => {
-        console.log('resp=',response.data);
+        console.log('resp=', response.data);
+        this.setState({ files: response.data })
+      })
+      .catch(error => {
+        console.log(error);
+      });
+  }*/
+ callPost(path,data) {
+    axios.post(path, {
+      data: data
+    })
+      .then(response => {
+        console.log('resp=', response.data);
         this.setState({ files: response.data })
       })
       .catch(error => {
@@ -48,43 +65,43 @@ class FileBrowser extends Component {
 
   getElapsedTime(time) {
     //console.log(time,typeof time);
-    if(time === 1) {
+    if (this.state.toggleStopStart !== false) {
+      this.setState({ toggleStopStart: false });
+    }
+    if (time === 1) {
       console.log('yes one');
-      this.callPost();
-    } 
+      this.callPost('/dir',this.state.path);
+    }
   }
   render() {
     return (
       <div>
-        <body>
-          <div id="page-wrapper" className="clearfix">
-            <h1>HTML5 Text Editor</h1>
-            <p>Powered by the FileSystem APIs.</p>
+        <div id="page-wrapper" className="clearfix">
+          <h1>Simple File Browser</h1>
 
-            <form action="#" method="POST" id="file-form">
-              <div className="field">
-                <input onChange={this.handlePathChange} type="text" name="filename" id="filename" placeholder="Filename (e.g. treehouse.txt)" />
-              </div>
-              <div className="field">
-                <textarea name="content" id="content" placeholder="Type your content here..."></textarea>
-              </div>
-              <div className="field">
-                <button type="submit">Save File</button>
-                <div id="messages"></div>
-              </div>
-            </form>
-
-            <div id="files">
-              <h2>File Browser</h2>
-              <ul id="file-list">
-              {this.state.files.map(file => <li className="directory" onClick={e => this.handleListItem(e,file)} key={file}>{file}</li>)}
-              </ul>
-
+          <form action="#" method="POST" id="file-form">
+            <div className="field">
+              <input onChange={this.handlePathChange} type="text" name="filename" id="filename" placeholder="Filename (e.g. treehouse.txt)" />
             </div>
+            <div className="field">
+              <textarea name="content" id="content" placeholder="Type your content here..."></textarea>
+            </div>
+            <div className="field">
+              <button type="submit">Save File</button>
+              <div id="messages"></div>
+            </div>
+          </form>
+
+          <div id="files">
+            <h2>File Browser</h2>
+            <ul id="file-list">
+              <ListItems handler={this.handleListItem} list={this.state.files} />
+            </ul>
+
           </div>
-            <div><Clock toggleStopStart={this.state.toggleStopStart} elapsedTime={(t) => this.getElapsedTime(t)}/></div>
-            <div><DebugButton handler={this.debugHandler} name={"debug"} /></div>
-        </body>
+        </div>
+        <div><Clock toggleStopStart={this.state.toggleStopStart} elapsedTime={(t) => this.getElapsedTime(t)} /></div>
+        <div><DebugButton handler={this.debugHandler} name={"debug"} /></div>
         <style jsx>{`
         *, *:before, *:after {
           -moz-box-sizing: border-box;
@@ -209,7 +226,10 @@ class FileBrowser extends Component {
         #files ul .directory {
           color: blue;
         }
-        
+         #files ul .file {
+          color: black;
+        }
+
         #messages {
           display: inline-block;
           font-weight: bold;
@@ -238,5 +258,5 @@ class FileBrowser extends Component {
       </div>
     )
   }
-  }
+}
   export default FileBrowser;

@@ -23,10 +23,17 @@ app.prepare().then(() => {
 
   server.post('/dir', (req,res) => {
     console.log('in dir=',req.body.data);
-    dir.readDir(req.body.data)
+    dir.filesDirs(req.body.data)
     .then(files => res.status(201).json(files))
     .catch(err => res.status(406).json({'error':'not a directory'}))
   })
+   server.post('/clickBrowser', (req,res) => {
+    console.log('in dir=',req.body.data);
+    dir.showDirectoryOrFileContent(req.body.data)
+    .then(files => res.status(201).json(files))
+    .catch(err => res.status(406).json({'error':'not a directory'}))
+  })
+  
 
   // Serve the item webpage with next.js as the renderer
   server.get('/item', (req, res) => {
