@@ -77,7 +77,7 @@ class FileBrowser extends Component {
             <div id="files">
               <h2>File Browser</h2>
               <ul id="file-list">
-              {this.state.files.map(file => <li onClick={e => this.handleListItem(e,file)} key={file}>{file}</li>)}
+              {this.state.files.map(file => <li className="directory" onClick={e => this.handleListItem(e,file)} key={file}>{file}</li>)}
               </ul>
 
             </div>
@@ -205,6 +205,9 @@ class FileBrowser extends Component {
         
         #files li {
           padding: 0.5rem 0;
+        }
+        #files ul .directory {
+          color: blue;
         }
         
         #messages {
