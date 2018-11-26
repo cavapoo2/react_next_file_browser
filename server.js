@@ -21,19 +21,29 @@ app.prepare().then(() => {
     return app.render(req, res, '/', req.query)
   })
 
-  server.post('/dir', (req,res) => {
-    console.log('in dir=',req.body.data);
-    dir.filesDirs(req.body.data)
-    .then(files => res.status(201).json(files))
-    .catch(err => res.status(406).json({'error':'not a directory'}))
+  server.post('/dir', async (req, res) => {
+    try {
+    let files = await dir.filesDirs(req.body.data);
+    res.status(201).json(files) ;
+    }
+    catch(err) {
+      console.log(err);
+      res.status(500).json({'error':'directory path error'})
+    }
   })
-   server.post('/clickBrowser', (req,res) => {
-    console.log('in clickBrowser=',req.body.data);
-    dir.showDirectoryOrFileContent(req.body.data.path,req.body.data.file)
-    .then(files => res.status(201).json(files))
-    .catch(err => res.status(406).json({'error':'not a directory'}))
+  server.post('/clickBrowser', async (req, res) => {
+    let path = req.body.data.path;
+    let file = req.body.data.file;
+    try {
+      let files = await dir.showDirectoryOrFileContent(path, file)
+      res.status(201).json(files)
+    }
+    catch (err) {
+      console.log(err)
+      res.status(500).json({ 'error': 'click file browser error' })
+    }
   })
-  
+
 
   // Serve the item webpage with next.js as the renderer
   server.get('/item', (req, res) => {
