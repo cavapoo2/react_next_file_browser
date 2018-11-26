@@ -21,13 +21,11 @@ class Clock extends Component {
                 seconds: 0,
                 toggle:!this.state.toggle,
             })
-        //    this.props.elapsedTime(0);
 
         } else {
             this.setState({
                 seconds: this.state.seconds + 1,
             });
-//            this.props.elapsedTime(this.state.seconds+1);
         }
         this.props.elapsedTime(this.state.seconds)
     }

@@ -1,12 +1,9 @@
 import React, { Component } from 'react';
-import Link from 'next/link';
 import Clock from '../components/intervalTimer';
 import DebugButton from '../components/debugButton';
 import ListItems from '../components/itemList'
 import axios from 'axios';
 import pathUtil from 'path';
-//import { copyFile } from 'fs';
-
 
 class FileBrowser extends Component {
   constructor(props) {
@@ -16,34 +13,38 @@ class FileBrowser extends Component {
       validPath: false,
       toggleStopStart: false,
       files: [],
-      content:'',
+      content: '',
     }
     this.handlePathChange = this.handlePathChange.bind(this);
     this.debugHandler = this.debugHandler.bind(this);
     this.handleListItem = this.handleListItem.bind(this);
+    this.handleButtonClick = this.handleButtonClick.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
   }
   validPath(value) {
     this.setState({ validPath: true })
   }
   debugHandler() {
     console.log(this.state);
-    this.state.files.map(f => console.log(f));
-    //console.log('content=',this.state.content)
   }
   handleListItem(event, file) {
-    console.log('file clicked is=', file);
-    this.callPostClick('/clickBrowser',{path:this.state.path,file:file}
-)
+    this.callPostClick('/clickBrowser', { path: this.state.path, file: file }
+    )
+  }
+  handleSubmit(event){
+    event.preventDefault();
+  }
 
+  handleButtonClick(event) {
+    event.preventDefault();
   }
   handlePathChange(event) {
-
     console.log('path=', event.target.value);
     this.validPath(event.target.value);
-    this.setState({ content:'',path: event.target.value, toggleStopStart: true });
+    this.setState({ content: '', path: event.target.value, toggleStopStart: true });
 
   }
-  callPost(path,data) {
+  callPost(path, data) {
     axios.post(path, {
       data: data
     })
@@ -55,20 +56,21 @@ class FileBrowser extends Component {
         console.log(error);
       });
   }
-  callPostClick(path,data) {
+  callPostClick(path, data) {
     axios.post(path, {
       data: data
     })
       .then(response => {
         console.log('resp=', response.data);
-        if(response.data.isDir === true){
-        this.setState({ files: response.data.res,
-          path:pathUtil.join(data.path,data.file),
-          content:'',
-         })
-        }else {
+        if (response.data.isDir === true) {
+          this.setState({
+            files: response.data.res,
+            path: pathUtil.join(data.path, data.file),
+            content: '',
+          })
+        } else {
           console.log('settign content');
-          this.setState({content:response.data.res})
+          this.setState({ content: response.data.res })
         }
       })
       .catch(error => {
@@ -77,13 +79,11 @@ class FileBrowser extends Component {
   }
 
   getElapsedTime(time) {
-    //console.log(time,typeof time);
     if (this.state.toggleStopStart !== false) {
       this.setState({ toggleStopStart: false });
     }
     if (time === 1) {
-      console.log('yes one');
-      this.callPost('/dir',this.state.path);
+      this.callPost('/dir', this.state.path);
     }
   }
   render() {
@@ -92,15 +92,15 @@ class FileBrowser extends Component {
         <div id="page-wrapper" className="clearfix">
           <h1>Simple File Browser</h1>
 
-          <form action="#" id="file-form">
+          <form onSubmit={this.handleSubmit} id="file-form">
             <div className="field">
               <input onChange={this.handlePathChange} value={this.state.path} type="text" name="filename" id="filename" placeholder="Enter a path" />
             </div>
             <div className="field">
-              <textarea readOnly={"true"} name="content" id="content" value={this.state.content}/>
+              <textarea readOnly={"true"} name="content" id="content" value={this.state.content} />
             </div>
             <div className="field">
-              <button type="submit">Save File</button>
+              <button onClick={this.handleButtonClick}>Save File</button>
               <div id="messages"></div>
             </div>
           </form>

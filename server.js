@@ -1,6 +1,5 @@
 const express = require('express');
 const next = require('next');
-const api = require('./operations/get-item');
 const dir = require('./operations/directory');
 
 const morgan = require('morgan');
@@ -15,7 +14,6 @@ app.prepare().then(() => {
   server.use(morgan(tinyOrDev));
   server.use(express.json());
 
-  // Set up home page as a simple render of the page.
   server.get('/', (req, res) => {
     console.log('Render home page')
     return app.render(req, res, '/', req.query)
@@ -43,20 +41,6 @@ app.prepare().then(() => {
       res.status(500).json({ 'error': 'click file browser error' })
     }
   })
-
-
-  // Serve the item webpage with next.js as the renderer
-  server.get('/item', (req, res) => {
-    const itemData = api.getItem()
-    app.render(req, res, '/item', { itemData })
-  })
-
-  // When rendering client-side, we will request the same data from this route
-  server.get('/_data/item', (req, res) => {
-    const itemData = api.getItem()
-    res.json(itemData)
-  })
-
   // Fall-back on other next.js assets.
   server.get('*', (req, res) => {
     return handle(req, res)
